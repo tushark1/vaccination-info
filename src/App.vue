@@ -1,7 +1,9 @@
 <template>
-  <div class="flex flex-col space-y-4">
+  <div class="relative flex flex-col space-y-4 h-screen">
     <nav-component></nav-component>
-    <div class="flex flex-col space-y-10 container mx-auto px-4 w-full">
+    <div
+      class="flex flex-grow flex-col space-y-10 container mx-auto px-4 w-full"
+    >
       <div
         class="flex flex-col space-y-4 lg:space-y-0 lg:flex-row items-center lg:space-x-4 border border-gray-500 rounded-xl p-4"
       >
@@ -90,6 +92,32 @@
         </div>
       </div>
     </div>
+    <footer
+      class="sticky bottom-0 flex items-center justify-between bg-gray-800 w-full p-6"
+    >
+      <div>
+        <p class="text-gray-400 font-mono text-sm">
+          <a
+            href="https://github.com/tushark1/vaccination-info.git"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @Tushark1
+          </a>
+        </p>
+      </div>
+      <div>
+        <p class="text-gray-400 font-mono text-sm">
+          <a
+            href="https://apisetu.gov.in/public/api/cowin"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Data gathered from Co-WIN Public API
+          </a>
+        </p>
+      </div>
+    </footer>
   </div>
 </template>
 
