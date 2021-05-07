@@ -30,7 +30,7 @@
         class="flex flex-wrap items-center text-gray-400 font-medium font-mono"
       >
         <span
-          class="border border-gray-400 px-2 py-1 rounded-lg mr-2"
+          class="border border-gray-400 px-2 py-1 rounded-lg mr-2 mb-1"
           v-for="slot in session.slots"
           :key="`${slot}-${session.id}`"
         >

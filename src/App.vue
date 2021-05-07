@@ -5,26 +5,75 @@
       class="flex flex-grow flex-col space-y-10 container mx-auto px-4 w-full"
     >
       <div
+        class="flex items-center space-x-4 border border-gray-500 rounded-xl p-4 w-full"
+      >
+        <p class="text-lg text-gray-400">Search by:</p>
+        <label
+          for="search_term_pin_code"
+          class="inline-flex items-center space-x-2"
+          ><input
+            type="radio"
+            value="pin_code"
+            name="search_term"
+            id="search_term_pin_code"
+            class="border-indigo-500 focus:border-indigo-400 focus:ring focus:ring-indigo-300 focus:ring-opacity-50 text-indigo-400"
+            v-model="search_term"
+          />
+          <span class="text-xl text-gray-400">Pincode</span>
+        </label>
+        <label
+          for="search_term_district"
+          class="inline-flex items-center space-x-2"
+          ><input
+            type="radio"
+            value="district"
+            name="search_term"
+            id="search_term_district"
+            class="border-indigo-500 focus:border-indigo-400 focus:ring focus:ring-indigo-300 focus:ring-opacity-50 text-indigo-400"
+            v-model="search_term"
+          />
+          <span class="text-xl text-gray-400">District</span>
+        </label>
+      </div>
+      <div
         class="flex flex-col space-y-4 lg:space-y-0 lg:flex-row items-center lg:space-x-4 border border-gray-500 rounded-xl p-4"
       >
-        <select-component
-          label="Select state"
-          :dataset="states"
-          v-model.number="state"
-          type="state"
-          :emitsChanges="true"
-          @valueChanged="loadDistricts()"
-        ></select-component>
-        <select-component
-          v-if="state > 0"
-          label="Select district"
-          :dataset="districts"
-          v-model.number="district"
-          type="district"
-          :emitsChanges="false"
-        ></select-component>
+        <template v-if="search_term !== 'pin_code'">
+          <select-component
+            label="Select state"
+            :dataset="states"
+            v-model.number="state"
+            type="state"
+            :emitsChanges="true"
+            @valueChanged="loadDistricts()"
+          ></select-component>
+        </template>
+        <template v-if="search_term !== 'pin_code'">
+          <select-component
+            v-if="state > 0"
+            label="Select district"
+            :dataset="districts"
+            v-model.number="district"
+            type="district"
+            :emitsChanges="false"
+          ></select-component>
+        </template>
         <div
-          v-if="state > 0 && district > 0"
+          v-if="search_term === 'pin_code'"
+          class="flex flex-col space-y-2 max-w-xs w-full"
+        >
+          <label class="text-xl font-medium" for="pin_code"
+            >Enter Pincode</label
+          >
+          <input
+            type="number"
+            id="pin_code"
+            v-model.number="pin_code"
+            class="w-full max-w-xs rounded-xl border-gray-300 focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 text-gray-700"
+          />
+        </div>
+        <div
+          v-if="(state > 0 && district > 0) || pin_code"
           class="flex flex-col space-y-2 max-w-xs w-full"
         >
           <label class="text-xl font-medium" for="date_selector">
@@ -37,10 +86,7 @@
             v-model="date"
           />
         </div>
-        <div
-          v-if="state > 0 && district > 0 && date"
-          class="flex flex-col space-y-2 max-w-xs w-full"
-        >
+        <div v-if="valid" class="flex flex-col space-y-2 max-w-xs w-full">
           <button
             class="focus:outline-none bg-gray-900 border border-gray-500 px-4 py-2 focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 rounded-xl lg:mt-[35px] focus:bg-gray-800"
             @click="loadCenters()"
@@ -49,8 +95,11 @@
           </button>
         </div>
       </div>
+      <div class="flex items-center justify-center" v-if="loading">
+        <p class="text-4xl text-gray-400 animate-bounce">Loading....</p>
+      </div>
       <div
-        v-if="centers.length > 0"
+        v-else-if="centers.length > 0"
         class="w-full border border-gray-500 rounded-xl p-4 flex flex-col space-y-4"
       >
         <div class="flex flex-col space-y-4">
@@ -91,9 +140,14 @@
           <center-component :center="center"></center-component>
         </div>
       </div>
+      <div v-if="centers.length <= 0 && searchPerformed">
+        <p class="text-center text-lg text-gray-500">
+          No centers found for the search performed
+        </p>
+      </div>
     </div>
     <footer
-      class="sticky bottom-0 flex items-center justify-between bg-gray-800 w-full p-6"
+      class="flex items-center justify-between bg-gray-800 w-full px-2 sm:px-4 py-1"
     >
       <div>
         <p class="text-gray-400 font-mono text-sm">
@@ -107,7 +161,7 @@
         </p>
       </div>
       <div>
-        <p class="text-gray-400 font-mono text-sm">
+        <p class="text-gray-400 font-sans text-sm">
           <a
             href="https://apisetu.gov.in/public/api/cowin"
             target="_blank"
@@ -136,6 +190,8 @@ export default {
       district: 0,
       date: "",
       filter_by_fees: "",
+      pin_code: "",
+      search_term: "pin_code",
     };
   },
   computed: {
@@ -143,7 +199,15 @@ export default {
       states: "getStates",
       districts: "getDistricts",
       centers: "getCenters",
+      loading: "getLoadingStatus",
+      searchPerformed: "searchPerformed",
     }),
+    valid() {
+      if (this.search_term === "pin_code") {
+        return this.pin_code && this.date;
+      }
+      return this.state && this.district && this.date;
+    },
     filteredCenters() {
       return (filter) => {
         if (filter) {
@@ -176,13 +240,44 @@ export default {
       }
     },
     loadCenters() {
-      this.$store.dispatch("loadCenters", {
-        district_id: this.district,
-        date: format(new Date(`${this.date}`), "dd-MM-yyyy"),
-      });
+      if (this.search_term === "pin_code") {
+        this.$store.dispatch("loadCentersByPinCode", {
+          pin_code: this.pin_code,
+          date: format(new Date(`${this.date}`), "dd-MM-yyyy"),
+        });
+      } else {
+        this.$store.dispatch("loadCenters", {
+          district_id: this.district,
+          date: format(new Date(`${this.date}`), "dd-MM-yyyy"),
+        });
+      }
+    },
+  },
+  watch: {
+    search_term: {
+      immediate: true,
+      handler() {
+        this.state = 0;
+        this.district = 0;
+        this.date = "";
+        this.filter_by_fees = "";
+        this.pin_code = "";
+        if (this.searchPerformed) {
+          this.$store.commit("clearSearch");
+        }
+      },
     },
   },
 };
 </script>
 
-<style></style>
+<style>
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+</style>
