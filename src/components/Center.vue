@@ -22,6 +22,20 @@
       </span>
     </div>
     <div>
+      <div
+        v-if="totalVaccines <= 0"
+        class="flex items-center text-lg font-semibold font-mono text-red-400"
+      >
+        Center fully booked for vaccination
+      </div>
+      <div
+        v-if="totalVaccines > 0"
+        class="flex items-center text-lg font-semibold font-mono text-green-400"
+      >
+        Available vaccines {{ totalVaccines }}
+      </div>
+    </div>
+    <div>
       <p class="text-gray-400">
         <span class="text-lg font-semibold">Timings: </span>
         <span class="text-base font-medium">
@@ -29,18 +43,21 @@
         </span>
       </p>
     </div>
-    <div class="bg-gray-800 p-4 border border-gray-500 w-full rounded-xl">
-      <div>
-        <p class="text-lg text-gray-400 font-medium">Sessions</p>
-        <div class="flex flex-col space-y-2">
-          <session
-            v-for="session in center.sessions"
-            :key="session.id"
-            :session="session"
-          >
-          </session>
-        </div>
-      </div>
+    <div>
+      <button
+        class="focus:outline-none bg-gray-900 border border-gray-500 px-4 py-2 focus:border-gray-400 focus:ring focus:ring-gray-200 focus:ring-opacity-50 rounded-xl focus:bg-gray-800"
+        @click="showDetail = !showDetail"
+      >
+        Show sessions/slots &darr;
+      </button>
+    </div>
+    <div v-if="showDetail" class="flex flex-col space-y-2">
+      <session
+        v-for="session in center.sessions"
+        :key="session.id"
+        :session="session"
+      >
+      </session>
     </div>
   </div>
 </template>
@@ -50,7 +67,9 @@ import Session from "./Session.vue";
 export default {
   name: "CenterComponent",
   data() {
-    return {};
+    return {
+      showDetail: false,
+    };
   },
   components: { Session },
   props: {
@@ -59,7 +78,14 @@ export default {
       type: Object,
     },
   },
-  computed: {},
+  computed: {
+    totalVaccines() {
+      let availability = this.center.sessions.map(
+        (session) => session.available_capacity
+      );
+      return availability.reduce((a, b) => a + b);
+    },
+  },
   filters: {
     timeFilter(val) {
       return new Date("1970-01-01T" + val + "Z").toLocaleTimeString(

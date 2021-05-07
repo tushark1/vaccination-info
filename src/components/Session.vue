@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col space-y-2 border border-gray-600 rounded-xl p-4">
+  <div
+    class="flex flex-col space-y-2 bg-gray-800 border border-gray-500 rounded-xl p-4"
+  >
     <div>
       <p class="text-sm text-gray-400 font-bold font-mono">
         Date: {{ session.date }}
@@ -12,11 +14,12 @@
     </div>
     <div>
       <p
-        class="text-sm font-bold font-mono"
-        :class="
-          session.available_capacity > 0 ? 'text-green-500' : 'text-red-400'
-        "
+        v-if="session.available_capacity <= 0"
+        class="text-sm font-bold font-mono text-red-400"
       >
+        Fully booked
+      </p>
+      <p v-else class="text-sm font-bold font-mono text-green-400">
         Available capacity: {{ session.available_capacity }}
       </p>
     </div>

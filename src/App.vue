@@ -99,13 +99,14 @@
         <p class="text-4xl text-gray-400 animate-bounce">Loading....</p>
       </div>
       <div
-        v-else-if="centers.length > 0"
+        v-else-if="filteredCenters(filter_by_fees).length > 0"
         class="w-full border border-gray-500 rounded-xl p-4 flex flex-col space-y-4"
       >
         <div class="flex flex-col space-y-4">
           <div>
             <p class="text-xl font-bold">
-              Vaccination centers (total: {{ centers.length }})
+              Vaccination centers (total:
+              {{ filteredCenters(filter_by_fees).length }})
             </p>
           </div>
           <div>
@@ -140,14 +141,16 @@
           <center-component :center="center"></center-component>
         </div>
       </div>
-      <div v-if="centers.length <= 0 && searchPerformed">
+      <div
+        v-if="filteredCenters(filter_by_fees).length <= 0 && searchPerformed"
+      >
         <p class="text-center text-lg text-gray-500">
           No centers found for the search performed
         </p>
       </div>
     </div>
     <footer
-      class="flex items-center justify-between bg-gray-800 w-full px-2 sm:px-4 py-1"
+      class="flex items-center justify-between bg-gray-800 w-full px-2 sm:px-4 py-4"
     >
       <div>
         <p class="text-gray-400 font-mono text-sm">
