@@ -99,7 +99,7 @@
         <p class="text-4xl text-gray-400 animate-bounce">Loading....</p>
       </div>
       <div
-        v-else-if="filteredCenters(filter_by_fees).length > 0"
+        v-else-if="centers.length > 0"
         class="w-full border border-gray-500 rounded-xl p-4 flex flex-col space-y-4"
       >
         <div class="flex flex-col space-y-4">
