@@ -2,7 +2,9 @@
   <div class="flex flex-col space-y-2 rounded-xl border border-gray-400 p-4">
     <div class="flex flex-col max-w-md w-full">
       <p class="text-lg font-bold font-mono">{{ center.name }}</p>
-      <p class="text-sm font-semibold text-gray-300">{{ center.address }}</p>
+      <p class="text-sm font-semibold text-gray-300">
+        {{ center.address }}, {{ center.pincode }}
+      </p>
     </div>
     <div class="flex items-center space-x-2">
       <span
@@ -83,7 +85,7 @@ export default {
       let availability = this.center.sessions.map(
         (session) => session.available_capacity
       );
-      return availability.reduce((a, b) => a + b);
+      return availability.reduce((a, b) => a + b, 0);
     },
   },
   filters: {

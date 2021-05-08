@@ -243,6 +243,7 @@ export default {
       }
     },
     loadCenters() {
+      this.filter_by_fees = "";
       if (this.search_term === "pin_code") {
         this.$store.dispatch("loadCentersByPinCode", {
           pin_code: this.pin_code,

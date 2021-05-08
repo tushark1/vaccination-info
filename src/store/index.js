@@ -24,7 +24,25 @@ export default new Vuex.Store({
       state.districts = [];
     },
     setCenters: (state, payload) => {
-      state.centers = JSON.parse(JSON.stringify(payload));
+      if (payload.length > 0) {
+        state.centers = JSON.parse(
+          JSON.stringify(
+            payload.sort((a, b) => {
+              const sumA = a.sessions.reduce(
+                (sum, entry) => sum + entry.available_capacity,
+                0
+              );
+              const sumB = b.sessions.reduce(
+                (sum, entry) => sum + entry.available_capacity,
+                0
+              );
+              return sumB - sumA;
+            })
+          )
+        );
+      } else {
+        state.centers = JSON.parse(JSON.stringify(payload));
+      }
     },
     clearSearch: (state) => {
       state.centers = [];
