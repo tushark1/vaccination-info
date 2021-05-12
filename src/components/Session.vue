@@ -9,7 +9,7 @@
     </div>
     <div>
       <p class="text-sm text-gray-400 font-bold font-mono">
-        Minimum age limit: {{ session.min_age_limit }} +
+        Minimum age limit: {{ session.min_age_limit }}+
       </p>
     </div>
     <div>

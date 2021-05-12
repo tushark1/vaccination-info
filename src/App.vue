@@ -109,6 +109,35 @@
               {{ filteredCenters(filter_by_fees).length }})
             </p>
           </div>
+          <div
+            class="grid md:grid-cols-3 md:grid-flow-col gap-4 border border-gray-400 rounded-lg p-4"
+          >
+            <p class="font-mono">
+              Total vaccines:
+              <span
+                :class="total.total > 0 ? 'text-green-400' : 'text-red-400'"
+                >{{ total.total }}</span
+              >
+            </p>
+            <p class="font-mono">
+              Total vaccines for 45+:
+              <span
+                :class="
+                  total.total_seniors > 0 ? 'text-green-400' : 'text-red-400'
+                "
+                >{{ total.total_seniors }}</span
+              >
+            </p>
+            <p class="font-mono">
+              Total vaccines for 18-44:
+              <span
+                :class="
+                  total.total_adults > 0 ? 'text-green-400' : 'text-red-400'
+                "
+                >{{ total.total_adults }}</span
+              >
+            </p>
+          </div>
           <div>
             <p class="text-lg font-bold text-gray-300 mb-2">Filter by type</p>
             <div class="flex items-center space-x-4">
@@ -218,6 +247,17 @@ export default {
         }
         return this.centers;
       };
+    },
+    total() {
+      let sessions = [
+        ...this.centers.map((center) => [...center.sessions]).flat(2),
+      ];
+      let adults = sessions.filter((session) => session.min_age_limit < 44);
+      let seniors = sessions.filter((session) => session.min_age_limit > 44);
+      let total = sessions.reduce((a, b) => a + b.available_capacity, 0);
+      let total_adults = adults.reduce((a, b) => a + b.available_capacity, 0);
+      let total_seniors = seniors.reduce((a, b) => a + b.available_capacity, 0);
+      return { total, total_adults, total_seniors };
     },
   },
   mounted() {
