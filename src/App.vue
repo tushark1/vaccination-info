@@ -112,14 +112,14 @@
           <div
             class="grid md:grid-cols-3 md:grid-flow-col gap-4 border border-gray-400 rounded-lg p-4"
           >
-            <p class="font-mono">
+            <p class="font-sans">
               Total vaccines:
               <span
                 :class="total.total > 0 ? 'text-green-400' : 'text-red-400'"
                 >{{ total.total }}</span
               >
             </p>
-            <p class="font-mono">
+            <p class="font-sans">
               Total vaccines for 45+:
               <span
                 :class="
@@ -128,7 +128,7 @@
                 >{{ total.total_seniors }}</span
               >
             </p>
-            <p class="font-mono">
+            <p class="font-sans">
               Total vaccines for 18-44:
               <span
                 :class="
@@ -182,7 +182,7 @@
       class="flex items-center justify-between bg-gray-800 w-full px-2 sm:px-4 py-4"
     >
       <div>
-        <p class="text-gray-400 font-mono text-sm">
+        <p class="text-gray-400 font-sans text-sm">
           <a
             href="https://github.com/tushark1/vaccination-info.git"
             target="_blank"

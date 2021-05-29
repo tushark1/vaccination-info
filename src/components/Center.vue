@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col space-y-2 rounded-xl border border-gray-400 p-4">
     <div class="flex flex-col max-w-md w-full">
-      <p class="text-lg font-bold font-mono">{{ center.name }}</p>
+      <p class="text-lg font-bold font-sans">{{ center.name }}</p>
       <p class="text-sm font-semibold text-gray-300">
         {{ center.address }}, {{ center.pincode }}
       </p>
@@ -23,18 +23,53 @@
         {{ center.fee_type }}
       </span>
     </div>
-    <div>
+    <div class="flex flex-col w-full">
       <div
-        v-if="totalVaccines <= 0"
-        class="flex items-center text-lg font-semibold font-mono text-red-400"
+        v-if="total.total <= 0"
+        class="flex items-center text-lg font-semibold font-sans text-red-400"
       >
         Center fully booked for vaccination
       </div>
-      <div
-        v-if="totalVaccines > 0"
-        class="flex items-center text-lg font-semibold font-mono text-green-400"
-      >
-        Available vaccines {{ totalVaccines }}
+      <div v-if="total.total > 0" class="flex items-center flex-wrap">
+        <div
+          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+        >
+          <div class="flex items-center divide-x divide-green-400">
+            <span class="pr-1">Total</span>
+            <span class="pl-1">{{ total.total }}</span>
+          </div>
+        </div>
+        <div
+          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+          v-if="total.total_seniors > 0"
+        >
+          <div class="flex items-center divide-x divide-green-400">
+            <span class="pr-1">Seniors(45+)</span>
+            <span class="pl-1">{{ total.total_seniors }}</span>
+          </div>
+        </div>
+        <div
+          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+          v-if="total.total_adults > 0"
+        >
+          <div class="flex items-center divide-x divide-green-400">
+            <span class="pr-1">Adults(18-44)</span>
+            <span class="pl-1">{{ total.total_adults }}</span>
+          </div>
+        </div>
+      </div>
+      <div v-if="center.fee_type === 'Paid' && vaccineFees.length > 0">
+        <div
+          class="flex md:items-center flex-col space-y-2 md:space-y-0 md:flex-row items-start flex-wrap md:space-x-2"
+        >
+          <span
+            class="font-medium font-sans text-green-400 border border-green-400 px-2 py-px rounded-md"
+            v-for="fee in vaccineFees"
+            :key="`${fee.vaccine}-${fee.fee}`"
+          >
+            {{ fee.vaccine }} ₹{{ fee.fee }}
+          </span>
+        </div>
       </div>
     </div>
     <div>
@@ -81,11 +116,23 @@ export default {
     },
   },
   computed: {
-    totalVaccines() {
-      let availability = this.center.sessions.map(
-        (session) => session.available_capacity
+    vaccineFees() {
+      return this.center.vaccine_fees ? this.center.vaccine_fees : [];
+    },
+    total() {
+      let adults = this.center.sessions.filter(
+        (session) => session.min_age_limit < 44
       );
-      return availability.reduce((a, b) => a + b, 0);
+      let seniors = this.center.sessions.filter(
+        (session) => session.min_age_limit > 44
+      );
+      let total = this.center.sessions.reduce(
+        (a, b) => a + b.available_capacity,
+        0
+      );
+      let total_adults = adults.reduce((a, b) => a + b.available_capacity, 0);
+      let total_seniors = seniors.reduce((a, b) => a + b.available_capacity, 0);
+      return { total, total_adults, total_seniors };
     },
   },
   filters: {
