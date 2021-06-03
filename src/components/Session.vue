@@ -22,6 +22,18 @@
       <p v-else class="text-sm font-bold font-sans text-green-400">
         Available capacity: {{ session.available_capacity }}
       </p>
+      <p
+        v-if="session.available_capacity_dose1 > 0"
+        class="text-sm font-bold font-sans text-green-400"
+      >
+        DOSE1 : {{ session.available_capacity_dose1 }}
+      </p>
+      <p
+        v-if="session.available_capacity_dose2 > 0"
+        class="text-sm font-bold font-sans text-green-400"
+      >
+        DOSE2 : {{ session.available_capacity_dose2 }}
+      </p>
     </div>
     <div>
       <p class="text-sm text-green-500 font-bold font-sans">
@@ -56,6 +68,7 @@ export default {
       type: Object,
     },
   },
+  computed: {},
 };
 </script>
 

@@ -110,33 +110,61 @@
             </p>
           </div>
           <div
-            class="grid md:grid-cols-3 md:grid-flow-col gap-4 border border-gray-400 rounded-lg p-4"
+            class="flex items-center flex-wrap border border-gray-400 rounded-lg p-4"
           >
-            <p class="font-sans">
-              Total vaccines:
-              <span
-                :class="total.total > 0 ? 'text-green-400' : 'text-red-400'"
-                >{{ total.total }}</span
-              >
-            </p>
-            <p class="font-sans">
-              Total vaccines for 45+:
-              <span
-                :class="
-                  total.total_seniors > 0 ? 'text-green-400' : 'text-red-400'
-                "
-                >{{ total.total_seniors }}</span
-              >
-            </p>
-            <p class="font-sans">
-              Total vaccines for 18-44:
-              <span
-                :class="
-                  total.total_adults > 0 ? 'text-green-400' : 'text-red-400'
-                "
-                >{{ total.total_adults }}</span
-              >
-            </p>
+            <div class="w-full lg:w-1/4 mr-2 mb-2">
+              <p class="font-sans">
+                Total vaccines:
+                <span
+                  :class="total.total > 0 ? 'text-green-400' : 'text-red-400'"
+                  >{{ total.total }}</span
+                >
+              </p>
+            </div>
+            <div class="w-full lg:w-1/4 mr-2 mb-2">
+              <p class="font-sans">
+                Total vaccines for 45+:
+                <span
+                  :class="
+                    total.total_seniors > 0 ? 'text-green-400' : 'text-red-400'
+                  "
+                  >{{ total.total_seniors }}</span
+                >
+              </p>
+            </div>
+            <div class="w-full lg:w-1/4 mr-2 mb-2">
+              <p class="font-sans">
+                Total vaccines for 18-44:
+                <span
+                  :class="
+                    total.total_adults > 0 ? 'text-green-400' : 'text-red-400'
+                  "
+                  >{{ total.total_adults }}</span
+                >
+              </p>
+            </div>
+            <div class="w-full lg:w-1/4 mr-2 mb-2">
+              <p class="font-sans">
+                Total vaccines DOSE1:
+                <span
+                  :class="
+                    total.total_dose1 > 0 ? 'text-green-400' : 'text-red-400'
+                  "
+                  >{{ total.total_dose1 }}</span
+                >
+              </p>
+            </div>
+            <div class="w-full lg:w-1/4 mr-2 mb-2">
+              <p class="font-sans">
+                Total vaccines DOSE2:
+                <span
+                  :class="
+                    total.total_dose2 > 0 ? 'text-green-400' : 'text-red-400'
+                  "
+                  >{{ total.total_dose2 }}</span
+                >
+              </p>
+            </div>
           </div>
           <div>
             <p class="text-lg font-bold text-gray-300 mb-2">Filter by type</p>
@@ -255,9 +283,17 @@ export default {
       let adults = sessions.filter((session) => session.min_age_limit < 44);
       let seniors = sessions.filter((session) => session.min_age_limit > 44);
       let total = sessions.reduce((a, b) => a + b.available_capacity, 0);
+      let total_dose1 = sessions.reduce(
+        (a, b) => a + b.available_capacity_dose1,
+        0
+      );
+      let total_dose2 = sessions.reduce(
+        (a, b) => a + b.available_capacity_dose2,
+        0
+      );
       let total_adults = adults.reduce((a, b) => a + b.available_capacity, 0);
       let total_seniors = seniors.reduce((a, b) => a + b.available_capacity, 0);
-      return { total, total_adults, total_seniors };
+      return { total, total_adults, total_seniors, total_dose1, total_dose2 };
     },
   },
   mounted() {
