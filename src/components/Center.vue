@@ -89,6 +89,19 @@
           </span>
         </div>
       </div>
+      <div v-else>
+        <div
+          class="flex md:items-center flex-col space-y-2 md:space-y-0 md:flex-row items-start flex-wrap md:space-x-2"
+        >
+          <span
+            class="font-medium font-sans text-green-400 border border-green-400 px-2 py-px rounded-md"
+            v-for="vaccine in vaccines"
+            :key="`${vaccine}-vaccine-${center.id}`"
+          >
+            {{ vaccine }}
+          </span>
+        </div>
+      </div>
     </div>
     <div>
       <p class="text-gray-400">
@@ -160,6 +173,12 @@ export default {
       let total_adults = adults.reduce((a, b) => a + b.available_capacity, 0);
       let total_seniors = seniors.reduce((a, b) => a + b.available_capacity, 0);
       return { total, total_adults, total_seniors, total_dose1, total_dose2 };
+    },
+    vaccines() {
+      let vaccines = [
+        ...new Set([...this.center.sessions.map((session) => session.vaccine)]),
+      ];
+      return vaccines;
     },
   },
   filters: {
