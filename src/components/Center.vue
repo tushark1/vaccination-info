@@ -41,20 +41,38 @@
         </div>
         <div
           class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_seniors > 0"
+          v-if="total.total_seniors_dose1 > 0"
         >
           <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">Seniors(45+)</span>
-            <span class="pl-1">{{ total.total_seniors }}</span>
+            <span class="pr-1">Seniors(45+) DOSE1</span>
+            <span class="pl-1">{{ total.total_seniors_dose1 }}</span>
           </div>
         </div>
         <div
           class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_adults > 0"
+          v-if="total.total_seniors_dose2 > 0"
         >
           <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">Adults(18-44)</span>
-            <span class="pl-1">{{ total.total_adults }}</span>
+            <span class="pr-1">Seniors(45+) DOSE2</span>
+            <span class="pl-1">{{ total.total_seniors_dose2 }}</span>
+          </div>
+        </div>
+        <div
+          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+          v-if="total.total_adults_dose1 > 0"
+        >
+          <div class="flex items-center divide-x divide-green-400">
+            <span class="pr-1">Adults(18-44) DOSE1</span>
+            <span class="pl-1">{{ total.total_adults_dose1 }}</span>
+          </div>
+        </div>
+        <div
+          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+          v-if="total.total_adults_dose2 > 0"
+        >
+          <div class="flex items-center divide-x divide-green-400">
+            <span class="pr-1">Adults(18-44) DOSE2</span>
+            <span class="pl-1">{{ total.total_adults_dose2 }}</span>
           </div>
         </div>
         <div
@@ -152,27 +170,32 @@ export default {
     },
     total() {
       let sessions = this.center.sessions;
-      let adults = this.center.sessions.filter(
-        (session) => session.min_age_limit < 44
-      );
-      let seniors = this.center.sessions.filter(
-        (session) => session.min_age_limit > 44
-      );
-      let total = this.center.sessions.reduce(
-        (a, b) => a + b.available_capacity,
-        0
-      );
-      let total_dose1 = sessions.reduce(
+      let adults = sessions.filter((session) => session.min_age_limit < 44);
+      let seniors = sessions.filter((session) => session.min_age_limit > 44);
+      let total = sessions.reduce((a, b) => a + b.available_capacity, 0);
+      let total_adults_dose1 = adults.reduce(
         (a, b) => a + b.available_capacity_dose1,
         0
       );
-      let total_dose2 = sessions.reduce(
+      let total_adults_dose2 = adults.reduce(
         (a, b) => a + b.available_capacity_dose2,
         0
       );
-      let total_adults = adults.reduce((a, b) => a + b.available_capacity, 0);
-      let total_seniors = seniors.reduce((a, b) => a + b.available_capacity, 0);
-      return { total, total_adults, total_seniors, total_dose1, total_dose2 };
+      let total_seniors_dose1 = seniors.reduce(
+        (a, b) => a + b.available_capacity_dose1,
+        0
+      );
+      let total_seniors_dose2 = seniors.reduce(
+        (a, b) => a + b.available_capacity_dose2,
+        0
+      );
+      return {
+        total,
+        total_adults_dose1,
+        total_seniors_dose1,
+        total_adults_dose2,
+        total_seniors_dose2,
+      };
     },
     vaccines() {
       let vaccines = [
