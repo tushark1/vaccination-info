@@ -114,7 +114,7 @@
               <tbody>
                 <tr class="border-b border-gray-600">
                   <td
-                    class="bg-gray-800 w-3/4 px-6 py-3 font-sans font-bold text-gray-300 rounded-tl-xl border-r border-gray-600"
+                    class="bg-gray-800 w-1/2 px-6 py-3 font-sans font-bold text-gray-300 rounded-tl-xl border-r border-gray-600"
                   >
                     Total vaccines
                   </td>
@@ -130,7 +130,7 @@
                   class="border-b border-gray-600"
                 >
                   <td
-                    class="bg-gray-800 w-3/4 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600"
+                    class="bg-gray-800 w-1/2 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600"
                   >
                     Min age {{ age }}
                   </td>
