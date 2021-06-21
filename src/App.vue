@@ -106,7 +106,7 @@
           <div>
             <p class="text-xl font-bold">
               Vaccination centers (total:
-              {{ filteredCenters(filter_by_fees).length }})
+              {{ filteredCenters.length }})
             </p>
           </div>
           <div class="w-full md:max-w-xl">
@@ -124,96 +124,61 @@
                     {{ total.total }}
                   </td>
                 </tr>
-                <tr class="border-b border-gray-600">
+                <tr
+                  v-for="age in ageGroups"
+                  :key="`age-group-${age}`"
+                  class="border-b border-gray-600"
+                >
                   <td
                     class="bg-gray-800 w-3/4 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600"
                   >
-                    SENIORS(45+) DOSE1
+                    Min age {{ age }}
                   </td>
                   <td
-                    class="bg-gray-800 w-auto px-6 py-3 font-sans font-bold text-right"
-                    :class="
-                      total.total_seniors_dose1 > 0
-                        ? 'text-green-400'
-                        : 'text-gray-400'
-                    "
+                    class="bg-gray-800 w-auto px-6 py-3 font-sans font-bold text-right flex flex-col space-y-px"
                   >
-                    {{ total.total_seniors_dose1 }}
-                  </td>
-                </tr>
-                <tr class="border-b border-gray-600">
-                  <td
-                    class="bg-gray-800 w-3/4 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600"
-                  >
-                    SENIORS(45+) DOSE2
-                  </td>
-                  <td
-                    class="bg-gray-800 w-auto px-6 py-3 font-sans font-bold text-right"
-                    :class="
-                      total.total_seniors_dose2 > 0
-                        ? 'text-green-400'
-                        : 'text-gray-400'
-                    "
-                  >
-                    {{ total.total_seniors_dose2 }}
-                  </td>
-                </tr>
-                <tr class="border-b border-gray-600">
-                  <td
-                    class="bg-gray-800 w-3/4 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600"
-                  >
-                    ADULTS(18 &rarr; 44) DOSE1
-                  </td>
-                  <td
-                    class="bg-gray-800 w-auto px-6 py-3 font-sans font-bold text-right"
-                    :class="
-                      total.total_adults_dose1 > 0
-                        ? 'text-green-400'
-                        : 'text-gray-400'
-                    "
-                  >
-                    {{ total.total_adults_dose1 }}
-                  </td>
-                </tr>
-                <tr>
-                  <td
-                    class="bg-gray-800 w-3/4 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600 rounded-bl-xl"
-                  >
-                    ADULTS(18 &rarr; 44) DOSE2
-                  </td>
-                  <td
-                    class="bg-gray-800 w-auto px-6 py-3 font-sans font-bold text-right rounded-br-xl"
-                    :class="
-                      total.total_adults_dose2 > 0
-                        ? 'text-green-400'
-                        : 'text-gray-400'
-                    "
-                  >
-                    {{ total.total_adults_dose2 }}
+                    <span
+                      :class="
+                        totalByAgeGroup(age).dose1 > 0
+                          ? 'text-green-500'
+                          : 'text-gray-400'
+                      "
+                      >DOSE1: {{ totalByAgeGroup(age).dose1 }}</span
+                    >
+                    <span
+                      :class="
+                        totalByAgeGroup(age).dose2 > 0
+                          ? 'text-green-500'
+                          : 'text-gray-400'
+                      "
+                      >DOSE2: {{ totalByAgeGroup(age).dose2 }}</span
+                    >
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div>
-            <p class="text-lg font-bold text-gray-300 mb-2">Filter by type</p>
+            <p class="text-lg font-bold text-gray-300 mb-2">
+              Filter by fees type
+            </p>
             <div class="flex items-center space-x-4">
               <button
                 class="px-4 py-px  border focus:outline-none rounded-lg border-green-400 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
                 :class="
-                  filter_by_fees === 'Free'
+                  filters.fee_type === 'Free'
                     ? 'text-white bg-green-400'
                     : 'text-green-400'
                 "
-                @click="filterByFees('Free')"
+                @click="applyFilters('fee_type', 'Free')"
               >
                 Free
               </button>
               <button
                 class="px-4 py-px border focus:outline-none rounded-lg border-red-400 focus:border-red-500 focus:ring focus:ring-red-200 focus:ring-opacity-50"
-                @click="filterByFees('Paid')"
+                @click="applyFilters('fee_type', 'Paid')"
                 :class="
-                  filter_by_fees === 'Paid'
+                  filters.fee_type === 'Paid'
                     ? 'text-white bg-red-400'
                     : 'text-red-400'
                 "
@@ -222,14 +187,55 @@
               </button>
             </div>
           </div>
+          <div>
+            <p class="text-lg font-bold text-gray-300 mb-2">
+              Filter by age group
+            </p>
+            <div class="flex items-center space-x-4">
+              <div v-for="age in ageGroups" :key="`filter-age-group-${age}`">
+                <button
+                  class="px-4 py-px  border focus:outline-none rounded-lg border-green-400 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+                  :class="
+                    filters.min_age_limit === age
+                      ? 'text-white bg-green-400'
+                      : 'text-green-400'
+                  "
+                  @click="applyFilters('min_age_limit', age)"
+                >
+                  {{ age }}+
+                </button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="text-lg font-bold text-gray-300 mb-2">
+              Filter by Vaccine
+            </p>
+            <div class="flex items-center space-x-4">
+              <div
+                v-for="vaccine in vaccines"
+                :key="`filter-age-group-${vaccine}`"
+              >
+                <button
+                  class="px-4 py-px  border focus:outline-none rounded-lg border-green-400 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+                  :class="
+                    filters.vaccine === vaccine
+                      ? 'text-white bg-green-400'
+                      : 'text-green-400'
+                  "
+                  @click="applyFilters('vaccine', vaccine)"
+                >
+                  {{ vaccine }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div v-for="center in filteredCenters(filter_by_fees)" :key="center.id">
+        <div v-for="center in filteredCenters" :key="center.id">
           <center-component :center="center"></center-component>
         </div>
       </div>
-      <div
-        v-if="filteredCenters(filter_by_fees).length <= 0 && searchPerformed"
-      >
+      <div v-if="filteredCenters.length <= 0 && searchPerformed">
         <p class="text-center text-lg text-gray-500">
           No centers found for the search performed
         </p>
@@ -279,6 +285,11 @@ export default {
       district: 0,
       date: "",
       filter_by_fees: "",
+      filters: {
+        fee_type: null,
+        min_age_limit: null,
+        vaccine: null,
+      },
       pin_code: "",
       search_term: "pin_code",
     };
@@ -297,45 +308,69 @@ export default {
       }
       return this.state && this.district && this.date;
     },
+    ageGroups() {
+      let sessions = [
+        ...this.centers.map((center) => [...center.sessions]).flat(2),
+      ];
+      let ages = sessions.map((session) => session.min_age_limit);
+      return [...new Set(ages)].sort();
+    },
     filteredCenters() {
-      return (filter) => {
-        if (filter) {
-          return this.centers.filter((center) => center.fee_type === filter);
-        }
-        return this.centers;
+      let centers = this.centers;
+      if (this.filters.fee_type) {
+        centers = centers.filter(
+          (center) => center.fee_type === this.filters.fee_type
+        );
+      }
+      if (this.filters.min_age_limit) {
+        centers = centers.filter((center) =>
+          center.sessions.some(
+            (session) =>
+              session.min_age_limit === this.filters.min_age_limit &&
+              session.available_capacity > 0
+          )
+        );
+      }
+      if (this.filters.vaccine) {
+        centers = centers.filter((center) =>
+          center.sessions.some(
+            (session) => session.vaccine === this.filters.vaccine
+          )
+        );
+      }
+      return centers;
+    },
+    totalByAgeGroup() {
+      let sessions = [
+        ...this.centers.map((center) => [...center.sessions]).flat(2),
+      ];
+      return (age_group) => {
+        let group = sessions.filter(
+          (session) => session.min_age_limit === age_group
+        );
+        return {
+          dose1: group.reduce((a, b) => a + b.available_capacity_dose1, 0),
+          dose2: group.reduce((a, b) => a + b.available_capacity_dose2, 0),
+        };
       };
     },
     total() {
       let sessions = [
         ...this.centers.map((center) => [...center.sessions]).flat(2),
       ];
-      let adults = sessions.filter((session) => session.min_age_limit < 44);
-      let seniors = sessions.filter((session) => session.min_age_limit > 44);
       let total = sessions.reduce((a, b) => a + b.available_capacity, 0);
-
-      let total_adults_dose1 = adults.reduce(
-        (a, b) => a + b.available_capacity_dose1,
-        0
-      );
-      let total_adults_dose2 = adults.reduce(
-        (a, b) => a + b.available_capacity_dose2,
-        0
-      );
-      let total_seniors_dose1 = seniors.reduce(
-        (a, b) => a + b.available_capacity_dose1,
-        0
-      );
-      let total_seniors_dose2 = seniors.reduce(
-        (a, b) => a + b.available_capacity_dose2,
-        0
-      );
       return {
         total,
-        total_adults_dose1,
-        total_adults_dose2,
-        total_seniors_dose1,
-        total_seniors_dose2,
       };
+    },
+    vaccines() {
+      let sessions = [
+        ...this.centers.map((center) => [...center.sessions]).flat(2),
+      ];
+      let vaccines = [
+        ...new Set([...sessions.map((session) => session.vaccine)]),
+      ];
+      return vaccines;
     },
   },
   mounted() {
@@ -349,6 +384,13 @@ export default {
         this.filter_by_fees = "";
       } else {
         this.filter_by_fees = fees;
+      }
+    },
+    applyFilters(type, value) {
+      if (this.filters[type] === value) {
+        this.filters[type] = null;
+      } else {
+        this.filters[type] = value;
       }
     },
     loadStates() {
@@ -382,7 +424,6 @@ export default {
         this.state = 0;
         this.district = 0;
         this.date = "";
-        this.filter_by_fees = "";
         this.pin_code = "";
         if (this.searchPerformed) {
           this.$store.commit("clearSearch");

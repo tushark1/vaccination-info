@@ -39,58 +39,31 @@
             <span class="pl-1">{{ total.total }}</span>
           </div>
         </div>
+
         <div
-          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_seniors_dose1 > 0"
+          class="flex items-center"
+          v-for="age in ageGroups"
+          :key="`center-age-group-${age}`"
         >
-          <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">Seniors(45+) DOSE1</span>
-            <span class="pl-1">{{ total.total_seniors_dose1 }}</span>
+          <div
+            class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+            v-if="totalByAgeGroup(age).dose1 > 0"
+          >
+            <div
+              class="flex items-center justify-center text-center text-sm font-bold"
+            >
+              <span>{{ age }}+ DOSE1-{{ totalByAgeGroup(age).dose1 }}</span>
+            </div>
           </div>
-        </div>
-        <div
-          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_seniors_dose2 > 0"
-        >
-          <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">Seniors(45+) DOSE2</span>
-            <span class="pl-1">{{ total.total_seniors_dose2 }}</span>
-          </div>
-        </div>
-        <div
-          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_adults_dose1 > 0"
-        >
-          <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">Adults(18-44) DOSE1</span>
-            <span class="pl-1">{{ total.total_adults_dose1 }}</span>
-          </div>
-        </div>
-        <div
-          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_adults_dose2 > 0"
-        >
-          <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">Adults(18-44) DOSE2</span>
-            <span class="pl-1">{{ total.total_adults_dose2 }}</span>
-          </div>
-        </div>
-        <div
-          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_dose1 > 0"
-        >
-          <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">DOSE1</span>
-            <span class="pl-1">{{ total.total_dose1 }}</span>
-          </div>
-        </div>
-        <div
-          class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
-          v-if="total.total_dose2 > 0"
-        >
-          <div class="flex items-center divide-x divide-green-400">
-            <span class="pr-1">DOSE2</span>
-            <span class="pl-1">{{ total.total_dose2 }}</span>
+          <div
+            class="text-green-400 border border-green-400 px-2 py-px rounded-md mr-2 mb-2"
+            v-if="totalByAgeGroup(age).dose2 > 0"
+          >
+            <div
+              class="flex items-center justify-center text-center text-sm font-bold"
+            >
+              <span>{{ age }}+ DOSE2-{{ totalByAgeGroup(age).dose2 }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -168,33 +141,28 @@ export default {
     vaccineFees() {
       return this.center.vaccine_fees ? this.center.vaccine_fees : [];
     },
+    ageGroups() {
+      let sessions = this.center.sessions;
+      let ages = sessions.map((session) => session.min_age_limit);
+      return [...new Set(ages)].sort();
+    },
+    totalByAgeGroup() {
+      let sessions = this.center.sessions;
+      return (age_group) => {
+        let group = sessions.filter(
+          (session) => session.min_age_limit === age_group
+        );
+        return {
+          dose1: group.reduce((a, b) => a + b.available_capacity_dose1, 0),
+          dose2: group.reduce((a, b) => a + b.available_capacity_dose2, 0),
+        };
+      };
+    },
     total() {
       let sessions = this.center.sessions;
-      let adults = sessions.filter((session) => session.min_age_limit < 44);
-      let seniors = sessions.filter((session) => session.min_age_limit > 44);
       let total = sessions.reduce((a, b) => a + b.available_capacity, 0);
-      let total_adults_dose1 = adults.reduce(
-        (a, b) => a + b.available_capacity_dose1,
-        0
-      );
-      let total_adults_dose2 = adults.reduce(
-        (a, b) => a + b.available_capacity_dose2,
-        0
-      );
-      let total_seniors_dose1 = seniors.reduce(
-        (a, b) => a + b.available_capacity_dose1,
-        0
-      );
-      let total_seniors_dose2 = seniors.reduce(
-        (a, b) => a + b.available_capacity_dose2,
-        0
-      );
       return {
         total,
-        total_adults_dose1,
-        total_seniors_dose1,
-        total_adults_dose2,
-        total_seniors_dose2,
       };
     },
     vaccines() {
