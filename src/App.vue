@@ -125,17 +125,27 @@
                   </td>
                 </tr>
                 <tr
-                  v-for="age in ageGroups"
+                  v-for="(age, age_index) in ageGroups"
                   :key="`age-group-${age}`"
-                  class="border-b border-gray-600"
+                  :class="
+                    age_index + 1 < ageGroups.length
+                      ? 'border-b border-gray-600'
+                      : ''
+                  "
                 >
                   <td
-                    class="bg-gray-800 w-1/2 px-6 py-3 font-sans font-bold text-gray-300 border-r border-gray-600"
+                    class="bg-gray-800 w-1/2 px-3 py-2 font-sans font-bold text-gray-300 border-r border-gray-600"
+                    :class="
+                      age_index + 1 < ageGroups.length ? '' : 'rounded-bl-xl'
+                    "
                   >
                     Min age {{ age }}
                   </td>
                   <td
-                    class="bg-gray-800 w-auto px-6 py-3 font-sans font-bold text-right flex flex-col space-y-px"
+                    class="bg-gray-800 w-auto px-3 py-2 font-sans font-bold text-right flex flex-col space-y-px"
+                    :class="
+                      age_index + 1 < ageGroups.length ? '' : 'rounded-br-xl'
+                    "
                   >
                     <span
                       :class="
