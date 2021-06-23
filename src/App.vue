@@ -240,6 +240,29 @@
               </div>
             </div>
           </div>
+          <div>
+            <p class="text-lg font-bold text-gray-300 mb-2">
+              Filter by block
+            </p>
+            <div class="flex items-center flex-wrap">
+              <div
+                v-for="block in block_names"
+                :key="`filter-block-names-${block}`"
+              >
+                <button
+                  class="px-4 py-px mr-2 mb-2 border focus:outline-none rounded-lg border-green-400 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+                  :class="
+                    filters.blocks.some((blk) => blk === block)
+                      ? 'text-white bg-green-400'
+                      : 'text-green-400'
+                  "
+                  @click="applyFilters('blocks', block)"
+                >
+                  {{ block }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         <div v-for="center in filteredCenters" :key="center.id">
           <center-component :center="center"></center-component>
@@ -299,6 +322,7 @@ export default {
         fee_type: null,
         min_age_limit: null,
         vaccine: null,
+        blocks: [],
       },
       pin_code: "",
       search_term: "pin_code",
@@ -348,6 +372,12 @@ export default {
           )
         );
       }
+      if (this.filters.blocks.length > 0) {
+        centers = centers.filter((center) =>
+          this.filters.blocks.includes(center.block_name)
+        );
+        console.log(centers);
+      }
       return centers;
     },
     totalByAgeGroup() {
@@ -382,6 +412,9 @@ export default {
       ];
       return vaccines;
     },
+    block_names() {
+      return [...new Set(this.centers.map((center) => center.block_name))];
+    },
   },
   mounted() {
     if (this.states.length === 0) {
@@ -397,6 +430,18 @@ export default {
       }
     },
     applyFilters(type, value) {
+      if (type === "blocks") {
+        if (this.filters[type].some((filter) => filter === value)) {
+          this.filters[type].splice(
+            this.filters[type].findIndex((filter) => filter === value),
+            1
+          );
+          return;
+        }
+        this.filters[type].push(value);
+        this.filters[type] = [...new Set(this.filters[type])];
+        return;
+      }
       if (this.filters[type] === value) {
         this.filters[type] = null;
       } else {
